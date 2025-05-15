@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Вход / Регистрация</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-dark text-white">
+<div id="app" class="container py-4" style="max-width:500px; margin:auto;">
+<h2 class="text-center mb-4">Добро пожаловать</h2>
+<!-- Вкладки -->
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a class="nav-link" :class="{ active: tab==='login' }" @click="tab='login'">Вход</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" :class="{ active: tab==='register' }" @click="tab='register'">Регистрация</a>
+  </li>
+</ul>
+
+<!-- Вход -->
+<div v-if="tab==='login'">
+  <div class="card p-4 bg-secondary text-dark">
+    <h4>Войти</h4>
+    <form @submit.prevent="login">
+      <div class="form-group">
+        <label>Логин</label>
+        <input v-model="loginForm.username" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input v-model="loginForm.password" type="password" class="form-control" required />
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Войти</button>
+    </form>
+  </div>
+</div>
+
+<!-- Регистрация -->
+<div v-if="tab==='register'">
+  <div class="card p-4 bg-secondary text-dark">
+    <h4>Регистрация</h4>
+    <form @submit.prevent="register">
+      <div class="form-group">
+        <label>Имя</label>
+        <input v-model="registerForm.name" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label>Логин</label>
+        <input v-model="registerForm.username" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input v-model="registerForm.password" type="password" class="form-control" required />
+      </div>
+      <button class="btn btn-success btn-block" type="submit">Зарегистрироваться</button>
+    </form>
+  </div>
+</div>
+</div>
+
+<script>
+new Vue({
+  el:'#app',
+  data: {
+    tab:'login',
+    loginForm: { username:'', password:'' },
+    registerForm: { name:'', username:'', password:'' }
+  },
+  methods:{
+    async login() {
+      try {
+        const res=await axios.post('/api/login', this.loginForm);
+        localStorage.setItem('user', JSON.stringify(res.data));
+        window.location='home.html';
+      } catch(e) {
+        alert('Неверные данные');
+      }
+    },
+    async register() {
+      try {
+        await axios.post('/api/register', this.registerForm);
+        alert('Регистрация успешна, войдите');
+        this.tab='login';
+      } catch(e) {
+        alert('Ошибка регистрации');
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

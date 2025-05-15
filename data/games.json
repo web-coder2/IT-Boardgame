@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1747346065526",
+    "userId": "1747346035670",
+    "playerName": "admin",
+    "timeMinutes": 50,
+    "points": 100,
+    "status": "выиграл"
+  },
+  {
+    "id": "1747346090718",
+    "userId": "1747346035670",
+    "playerName": "admin",
+    "timeMinutes": 100,
+    "points": 50,
+    "status": "проиграл"
+  },
+  {
+    "id": "1747346148922",
+    "userId": "1747346106625",
+    "playerName": "tester",
+    "timeMinutes": 100,
+    "points": 500,
+    "status": "проиграл"
+  }
+]
