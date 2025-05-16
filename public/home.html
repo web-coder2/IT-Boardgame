@@ -1,214 +1,275 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Личный кабинет</title>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
-<!-- Для иконки короны -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Личный кабинет</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
-<body class="bg-dark text-white">
-<div id="app" class="container py-4" v-if="user">
-<h2 class="mb-4">Личный кабинет: {{ user.name }}</h2>
-<button class="btn btn-secondary mb-3" @click="logout">Выйти</button>
+<body>
+<div id="app" class="py-4 px-3">
 
-<!-- Вкладки -->
-<ul class="nav nav-tabs mb-3">
-  <li class="nav-item"><a class="nav-link" :class="{ active: tab==='profile' }" @click="tab='profile'">Профиль</a></li>
-  <li class="nav-item"><a class="nav-link" :class="{ active: tab==='games' }" @click="tab='games'">Мои игры</a></li>
-  <li class="nav-item"><a class="nav-link" :class="{ active: tab==='rating' }" @click="tab='rating'; loadRatings()">Рейтинг</a></li>
-</ul>
-
-<!-- Профиль -->
-<div v-if="tab==='profile'">
-<h4>Редактировать профиль</h4>
-<form @submit.prevent="updateProfile">
-  <div class="form-group">
-    <label>Имя</label>
-    <input v-model="user.name" class="form-control" required />
+  <div v-if="!user" class="text-center mt-5">
+    <h3>Пожалуйста, войдите или зарегистрируйтесь</h3>
+    <a href="login.html" class="btn btn-primary mt-3">Войти</a>
   </div>
-  <div class="form-group">
-    <label>Пароль</label>
-    <input v-model="user.password" type="password" placeholder="Новый пароль" class="form-control" />
+
+  <div v-else>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="mb-0">Личный кабинет: {{ user.name }}</h2>
+      <button class="btn btn-secondary btn-sm" @click="logout"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+    </div>
+
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item">
+        <a class="nav-link" :class="{ active: tab==='profile' }" @click.prevent="tab='profile'" href="#"><i class="fas fa-user"></i> Профиль</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" :class="{ active: tab==='games' }" @click.prevent="tab='games'" href="#"><i class="fas fa-gamepad"></i> Мои игры</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" :class="{ active: tab==='rating' }" @click.prevent="tab='rating'; loadRatings()" href="#"><i class="fas fa-star"></i> Рейтинг</a>
+      </li>
+    </ul>
+
+    <div v-if="tab==='profile'" class="card p-4 mb-4">
+      <h4 class="mb-3"><i class="fas fa-user-cog"></i> Редактировать профиль</h4>
+      <form @submit.prevent="updateProfile">
+        <div class="form-group">
+          <label><i class="fas fa-id-badge"></i> Имя</label>
+          <input v-model="user.name" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Новый пароль</label>
+          <input v-model="user.password" type="password" placeholder="Введите новый пароль" class="form-control" />
+        </div>
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-save"></i> Обновить</button>
+      </form>
+    </div>
+
+    <div v-if="tab==='games'" class="card p-4 mb-4">
+      <h4 class="mb-3"><i class="fas fa-plus-circle"></i> Добавить игру</h4>
+      <form @submit.prevent="addGame" class="mb-4">
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label><i class="fas fa-clock"></i> Время (мин)</label>
+            <input v-model.number="newGame.timeMinutes" type="number" class="form-control" required />
+          </div>
+          <div class="form-group col-md-3">
+            <label><i class="fas fa-lightbulb"></i> Очки</label>
+            <input v-model.number="newGame.points" type="number" class="form-control" required />
+          </div>
+          <div class="form-group col-md-3">
+            <label><i class="fas fa-info-circle"></i> Статус</label>
+            <select v-model="newGame.status" class="form-control" required>
+              <option value="выиграл">Выиграл</option>
+              <option value="проиграл">Проиграл</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-success" type="submit"><i class="fas fa-plus"></i> Добавить игру</button>
+      </form>
+
+      <h4 class="mb-3"><i class="fas fa-list"></i> Ваши игры</h4>
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th><i class="fas fa-user"></i> Имя игрока</th>
+            <th><i class="fas fa-clock"></i> Время (мин)</th>
+            <th><i class="fas fa-lightbulb"></i> Очки</th>
+            <th><i class="fas fa-star"></i> Рейтинг</th>
+            <th><i class="fas fa-info-circle"></i> Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="g in userGames" :key="g.id">
+            <td>{{ g.playerName }}</td>
+            <td>{{ g.timeMinutes }}</td>
+            <td>{{ g.points }}</td>
+            <td>{{ calculateGameRating(g).toFixed(2) }}</td>
+            <td>{{ g.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-if="tab==='rating'" class="card p-4 mb-4">
+      <h4 class="mb-3"><i class="fas fa-star"></i> Таблица рейтинга</h4>
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th><i class="fas fa-user"></i> Имя</th>
+            <th><i class="fas fa-gamepad"></i> Всего игр</th>
+            <th><i class="fas fa-trophy"></i> Побед</th>
+            <th><i class="fas fa-star"></i> Рейтинг</th>
+            <th><i class="fas fa-crown"></i> Лучший</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="player in ratings" :key="player.name">
+            <td>{{ player.name }}</td>
+            <td>{{ player.totalGames }}</td>
+            <td>{{ player.wins }}</td>
+            <td>{{ player.rating.toFixed(2) }}</td>
+            <td>
+              <i v-if="player.rating===maxRating" class="fas fa-crown"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <button class="btn btn-primary" type="submit">Обновить</button>
-</form>
 </div>
 
-<!-- Мои игры -->
-<div v-if="tab==='games'">
-<h4>Добавить игру</h4>
-<form @submit.prevent="addGame" class="mb-4">
-  <div class="form-row">
-    <div class="form-group col-md-3">
-      <label>Время (мин)</label>
-      <input v-model.number="newGame.timeMinutes" type="number" class="form-control" required />
-    </div>
-    <div class="form-group col-md-3">
-      <label>Очки</label>
-      <input v-model.number="newGame.points" type="number" class="form-control" required />
-    </div>
-    <div class="form-group col-md-3">
-      <label>Статус</label>
-      <select v-model="newGame.status" class="form-control" required>
-        <option value="выиграл">Выиграл</option>
-        <option value="проиграл">Проиграл</option>
-      </select>
-    </div>
-  </div>
-  <button class="btn btn-success" type="submit">Добавить игру</button>
-</form>
-
-<h4>Ваши игры</h4>
-<table class="table table-striped table-dark">
-  <thead>
-    <tr>
-      <th>Имя игрока</th>
-      <th>Время (мин)</th>
-      <th>Очки</th>
-      <th>Рейтинг</th>
-      <th>Статус</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="g in userGames" :key="g.id">
-      <td>{{ g.playerName }}</td>
-      <td>{{ g.timeMinutes }}</td>
-      <td>{{ g.points }}</td>
-      <td>{{ calculateGameRating(g).toFixed(2) }}</td>
-      <td>{{ g.status }}</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-<!-- Таблица рейтинга для всех игроков -->
-<div v-if="tab==='rating'">
-<h4>Таблица рейтинга</h4>
-<table class="table table-striped table-dark">
-  <thead>
-    <tr>
-      <th>Имя</th>
-      <th>Всего игр</th>
-      <th>Побед</th>
-      <th>Рейтинг</th>
-      <th>Лучший</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="player in ratings" :key="player.name">
-      <td>{{ player.name }}</td>
-      <td>{{ player.totalGames }}</td>
-      <td>{{ player.wins }}</td>
-      <td>{{ player.rating.toFixed(2) }}</td>
-      <td>
-        <i v-if="player.rating===maxRating" class="fas fa-crown" style="color:gold"></i>
-      </td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-<script>
-if(!localStorage.getItem('user')) {
-  window.location='login.html';
-}
-
-new Vue({
-  el:'#app',
-  data:{
-    user: JSON.parse(localStorage.getItem('user')),
-    tab:'profile',
-    newGame:{playerName: '', timeMinutes:0, points:0, status:'выиграл'},
-    userGames: [],
-    ratings: [], // Массив игроков
-    maxRating: 0
-  },
-  mounted() {
-    this.loadUserGames();
-  },
-  methods:{
-    logout() {
-      localStorage.removeItem('user');
-      window.location='login.html';
-    },
-    async loadUserGames() {
-      try {
-        const res= await axios.get('/api/games/'+this.user.id);
-        this.userGames=res.data;
-      } catch(e){ console.error(e);}
-    },
-    async loadAllGames() {
-      try {
-        const res= await axios.get('/api/games'); // все игры
-        const games= res.data;
-
-        // группировка по имени игрока
-        const playersMap= {};
-        games.forEach(g => {
-          if(!playersMap[g.playerName]){
-            playersMap[g.playerName]= {
-              name: g.playerName,
-              totalGames: 0,
-              wins: 0,
-              totalRating: 0,
-              bestRating: 0,
-              rating: 0 // добавим для хранения среднего или другого
-            };
-          }
-          const p= playersMap[g.playerName];
-          p.totalGames++;
-          if(g.status==='выиграл') p.wins++;
-          const rating= this.calculateGameRating(g);
-          p.totalRating+= rating;
-          if(rating > p.bestRating) p.bestRating= rating;
-        });
-        // вычисляем средний рейтинг или используем сумму
-        this.ratings= Object.values(playersMap).map(p => {
-          p.rating = p.totalRating / p.totalGames; // например, средний рейтинг
-          return p;
-        });
-        if(this.ratings.length > 0) {
-          this.maxRating= Math.max(...this.ratings.map(p=>p.rating));
-        } else {
-          this.maxRating=0;
-        }
-      } catch(e){ console.error(e);}
-    },
-    async updateProfile() {
-      try {
-        await axios.post('/api/user/'+this.user.id, { name:this.user.name, password:this.user.password });
-        alert('Данные обновлены');
-        localStorage.setItem('user', JSON.stringify(this.user));
-      } catch(e){ console.error(e);}
-    },
-    async addGame() {
-      try {
-        await axios.post('/api/games', {
-          userId:this.user.id,
-          playerName:this.user.name,
-          timeMinutes:this.newGame.timeMinutes,
-          points:this.newGame.points,
-          status:this.newGame.status
-        });
-        this.loadUserGames();
-        this.loadAllGames(); // обновляем рейтинг
-        this.newGame= {playerName:this.user.name, timeMinutes:0, points:0, status:'выиграл'};
-      } catch(e){ console.error(e);}
-    },
-    calculateGameRating(g) {
-      return (g.points * g.timeMinutes)/10;
-    },
-    // Загружаем рейтинг при выборе вкладки
-    loadRatings() {
-      this.loadAllGames();
-    }
-  }
-});
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>
 </html>
+
+<style>
+  body {
+    background-color: #121212;
+    color: #fff;
+  }
+  #app {
+    max-width: 1000px;
+    margin: auto;
+  }
+  h2 {
+    font-weight: 700;
+  }
+  .nav-tabs .nav-link {
+    color: #bbb;
+    font-weight: 500;
+  }
+  .nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: #333;
+    border-color: #555 #555 #222;
+    border-top: 3px solid #ffd700;
+  }
+  .card {
+    background-color: #1e1e1e;
+    border: none;
+  }
+  .form-control {
+    background-color: #2c2c2c;
+    color: #eee;
+    border: 1px solid #555;
+  }
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #ffd700;
+  }
+  .btn-custom {
+    background-color: #222;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  .btn-custom:hover {
+    background-color: #444;
+    box-shadow: 0 0 10px #ffd700;
+  }
+  .fa-crown {
+    color: gold;
+  }
+  table {
+    font-size: 0.9rem;
+  }
+</style>
+
+<script>
+
+  if(!localStorage.getItem('user')) {
+    window.location='login.html';
+  }
+  
+  new Vue({
+    el:'#app',
+    data:{
+      user: JSON.parse(localStorage.getItem('user')),
+      tab:'profile',
+      newGame:{playerName: '', timeMinutes:0, points:0, status:'выиграл'},
+      userGames: [],
+      ratings: [],
+      maxRating: 0
+    },
+    mounted() {
+      this.loadUserGames();
+    },
+    methods:{
+      logout() {
+        localStorage.removeItem('user');
+        window.location='login.html';
+      },
+      async loadUserGames() {
+        try {
+          const res= await axios.get('/api/games/'+this.user.id);
+          this.userGames=res.data;
+        } catch(e){ console.error(e);}
+      },
+      async loadAllGames() {
+        try {
+          const res= await axios.get('/api/games');
+          const games= res.data;
+          const playersMap= {};
+          games.forEach(g => {
+            if(!playersMap[g.playerName]){
+              playersMap[g.playerName]= {
+                name: g.playerName,
+                totalGames: 0,
+                wins: 0,
+                totalRating: 0,
+                bestRating: 0,
+                rating: 0
+              };
+            }
+            const p= playersMap[g.playerName];
+            p.totalGames++;
+            if(g.status==='выиграл') p.wins++;
+            const rating= this.calculateGameRating(g);
+            p.totalRating+= rating;
+            if(rating > p.bestRating) p.bestRating= rating;
+          });
+          this.ratings= Object.values(playersMap).map(p => {
+            p.rating = p.totalRating / p.totalGames;
+            return p;
+          });
+          if(this.ratings.length > 0) {
+            this.maxRating= Math.max(...this.ratings.map(p=>p.rating));
+          } else {
+            this.maxRating=0;
+          }
+        } catch(e){ console.error(e);}
+      },
+      async updateProfile() {
+        try {
+          await axios.post('/api/user/'+this.user.id, { name:this.user.name, password:this.user.password });
+          alert('Данные обновлены');
+          localStorage.setItem('user', JSON.stringify(this.user));
+        } catch(e){ console.error(e);}
+      },
+      async addGame() {
+        try {
+          await axios.post('/api/games', {
+            userId:this.user.id,
+            playerName:this.user.name,
+            timeMinutes:this.newGame.timeMinutes,
+            points:this.newGame.points,
+            status:this.newGame.status
+          });
+          this.loadUserGames();
+          this.loadAllGames();
+          this.newGame= {playerName:this.user.name, timeMinutes:0, points:0, status:'выиграл'};
+        } catch(e){ console.error(e);}
+      },
+      calculateGameRating(g) {
+        return (g.points * g.timeMinutes)/10;
+      },
+      loadRatings() {
+        this.loadAllGames();
+      }
+    }
+  });
+  </script>

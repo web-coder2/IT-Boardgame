@@ -22,5 +22,37 @@
     "timeMinutes": 100,
     "points": 500,
     "status": "проиграл"
+  },
+  {
+    "id": "1747381763196",
+    "userId": "1747381745524",
+    "playerName": "zxc",
+    "timeMinutes": 120,
+    "points": 1200,
+    "status": "выиграл"
+  },
+  {
+    "id": "1747381769638",
+    "userId": "1747381745524",
+    "playerName": "zxc",
+    "timeMinutes": 50,
+    "points": 40,
+    "status": "выиграл"
+  },
+  {
+    "id": "1747381778960",
+    "userId": "1747381745524",
+    "playerName": "zxc",
+    "timeMinutes": 80,
+    "points": 800,
+    "status": "проиграл"
+  },
+  {
+    "id": "1747393252939",
+    "userId": "1747346035670",
+    "playerName": "admin",
+    "timeMinutes": 900,
+    "points": 180,
+    "status": "выиграл"
   }
 ]

@@ -1,96 +1,141 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Вход / Регистрация</title>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>HBA IT-BoardGame</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 </head>
-<body class="bg-dark text-white">
-<div id="app" class="container py-4" style="max-width:500px; margin:auto;">
-<h2 class="text-center mb-4">Добро пожаловать</h2>
-<!-- Вкладки -->
-<ul class="nav nav-tabs mb-3">
-  <li class="nav-item">
-    <a class="nav-link" :class="{ active: tab==='login' }" @click="tab='login'">Вход</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" :class="{ active: tab==='register' }" @click="tab='register'">Регистрация</a>
-  </li>
-</ul>
-
-<!-- Вход -->
-<div v-if="tab==='login'">
-  <div class="card p-4 bg-secondary text-dark">
-    <h4>Войти</h4>
-    <form @submit.prevent="login">
-      <div class="form-group">
-        <label>Логин</label>
-        <input v-model="loginForm.username" class="form-control" required />
+<body>
+  <div id="app">
+    <div class="auth-box shadow-lg">
+      <h2 class="text-center">Войти или зарегистрироваться</h2>
+      
+      <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: tab==='login' }" @click.prevent="tab='login'" href="#">Логин</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: tab==='register' }" @click.prevent="tab='register'" href="#">Регистрация</a>
+        </li>
+      </ul>
+      
+      <form v-if="tab==='login'" @submit.prevent="login">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Логин" v-model="loginForm.username" required />
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" placeholder="Пароль" v-model="loginForm.password" required />
+        </div>
+        <button type="submit" class="btn btn-custom btn-block mt-3">Войти</button>
+      </form>
+      
+      <form v-else @submit.prevent="register">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Имя" v-model="registerForm.name" required />
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Логин" v-model="registerForm.username" required />
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" placeholder="Пароль" v-model="registerForm.password" required />
+        </div>
+        <button type="submit" class="btn btn-custom btn-block mt-3">Зарегистрироваться</button>
+      </form>
+      
+      <div class="text-center small-text mt-3">
+        <a href="#" style="color:#ccc;">Забыли пароль?</a>
       </div>
-      <div class="form-group">
-        <label>Пароль</label>
-        <input v-model="loginForm.password" type="password" class="form-control" required />
-      </div>
-      <button class="btn btn-primary btn-block" type="submit">Войти</button>
-    </form>
+    </div>
   </div>
-</div>
-
-<!-- Регистрация -->
-<div v-if="tab==='register'">
-  <div class="card p-4 bg-secondary text-dark">
-    <h4>Регистрация</h4>
-    <form @submit.prevent="register">
-      <div class="form-group">
-        <label>Имя</label>
-        <input v-model="registerForm.name" class="form-control" required />
-      </div>
-      <div class="form-group">
-        <label>Логин</label>
-        <input v-model="registerForm.username" class="form-control" required />
-      </div>
-      <div class="form-group">
-        <label>Пароль</label>
-        <input v-model="registerForm.password" type="password" class="form-control" required />
-      </div>
-      <button class="btn btn-success btn-block" type="submit">Зарегистрироваться</button>
-    </form>
-  </div>
-</div>
-</div>
-
-<script>
-new Vue({
-  el:'#app',
-  data: {
-    tab:'login',
-    loginForm: { username:'', password:'' },
-    registerForm: { name:'', username:'', password:'' }
-  },
-  methods:{
-    async login() {
-      try {
-        const res=await axios.post('/api/login', this.loginForm);
-        localStorage.setItem('user', JSON.stringify(res.data));
-        window.location='home.html';
-      } catch(e) {
-        alert('Неверные данные');
-      }
-    },
-    async register() {
-      try {
-        await axios.post('/api/register', this.registerForm);
-        alert('Регистрация успешна, войдите');
-        this.tab='login';
-      } catch(e) {
-        alert('Ошибка регистрации');
-      }
-    }
-  }
-});
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>
 </html>
+
+<style>
+  body {
+    background-color: #000;
+  }
+  #app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .auth-box {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+  }
+  h2 {
+    color: #fff;
+    margin-bottom: 20px;
+  }
+  .form-control {
+    background-color: #333 !important;
+    color: #eee !important;
+    border: 1px solid #555;
+  }
+  .form-control:focus {
+    background-color: #444 !important;
+    box-shadow: 0 0 8px rgba(255,255,255,0.3);
+  }
+  .btn-custom {
+    background-color: #222;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    transition: background-color 0.3s, box-shadow 0.2s;
+  }
+  .btn-custom:hover {
+    background-color: #444;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+  }
+  .nav-tabs .nav-link {
+    color: #ccc;
+  }
+  .nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: #222;
+    border-color: #555 #555 #222;
+    border-top: 3px solid #fff;
+  }
+  .small-text {
+    color: #ccc;
+  }
+</style>
+
+<script>
+  new Vue({
+    el:'#app',
+    data: {
+      tab:'login', // активная вкладка
+      loginForm: { username:'', password:'' },
+      registerForm: { name:'', username:'', password:'' }
+    },
+    methods:{
+      async login() {
+        try {
+          const res=await axios.post('/api/login', this.loginForm);
+          localStorage.setItem('user', JSON.stringify(res.data));
+          window.location='home.html'; // или ваша страница
+        } catch(e) {
+          alert('Неверные данные');
+        }
+      },
+      async register() {
+        try {
+          await axios.post('/api/register', this.registerForm);
+          alert('Регистрация успешна, войдите');
+          this.tab='login';
+          // Очистить форму
+          this.registerForm = { name:'', username:'', password:'' };
+        } catch(e) {
+          alert('Ошибка регистрации');
+        }
+      }
+    }
+  });
+</script>

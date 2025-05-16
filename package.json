@@ -1,0 +1,23 @@
+{
+  "name": "it-boardgame",
+  "version": "1.0.0",
+  "description": "IT Boardgame on vue.js express.js ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [
+    "vue.js",
+    "express.js",
+    "bootstrap4"
+  ],
+  "author": "w3b-c0d3r",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.3",
+    "nodemon": "^3.1.10"
+  }
+}
